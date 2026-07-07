@@ -26,7 +26,8 @@ app.get('/api/health', (req, res) => {
 // Plug in the authentication routes
 app.use('/api/auth', require('./routes/authRoutes'));
 
-// app.use('/api/reports', require('./routes/reportRoutes'));
+app.use('/api/reports', require('./routes/reportRoutes'));
+
 // app.use('/api/projects', require('./routes/projectRoutes'));
 
 // --- START SERVER ---
