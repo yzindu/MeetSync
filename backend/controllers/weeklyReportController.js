@@ -82,3 +82,70 @@ exports.getAllReports = async (req, res) => {
         res.status(500).json({ message: 'Server error during report fetching' });
     }
 }
+
+
+// et dashboard summary metrics for managers 
+exports.getDashboardMetrics = async (req, res) => {
+    try {
+        const { startDate, endDate } = req.query;
+
+        // Date Filtering 
+        let matchStage = {};
+        if (startDate && endDate) {
+            matchStage.weekStartDate = { $gte: new Date(startDate) };
+            matchStage.weekEndDate = { $lte: new Date(endDate) };
+        }
+
+        // MongoDB aggregation pipeline
+        const metrics = await Report.aggregate([
+            { $match: matchStage },
+            {
+                $group: {
+                    _id: null, // Group everything into one single result
+                    totalReports: { $sum: 1 },
+                    submittedReports: {
+                        $sum: { $cond: [{ $eq: ["$status", "Submitted"] }, 1, 0] }
+                    },
+                    pendingReports: {
+                        $sum: { $cond: [{ $eq: ["$status", "Pending"] }, 1, 0] }
+                    },
+                    // Count reports where the blockers array has at least 1 item
+                    reportsWithBlockers: {
+                        $sum: {
+                            $cond: [
+                                { $gt: [{ $size: { $ifNull: ["$blockers", []] } }, 0] }, 1, 0
+                            ]
+                        }
+                    }
+                }
+            }
+        ]);
+
+        // Format the response 
+        if (metrics.length === 0) {
+            return res.status(200).json({
+                totalReports: 0, submittedReports: 0, pendingReports: 0,
+                complianceRate: "0%", reportsWithBlockers: 0
+            });
+        }
+
+        const data = metrics[0];
+
+        // Calculate the percentage of submitted reports
+        const complianceRate = data.totalReports > 0
+            ? Math.round((data.submittedReports / data.totalReports) * 100)
+            : 0;
+
+        res.status(200).json({
+            totalReports: data.totalReports,
+            submittedReports: data.submittedReports,
+            pendingReports: data.pendingReports,
+            complianceRate: `${complianceRate}%`,
+            reportsWithBlockers: data.reportsWithBlockers
+        });
+
+    } catch (error) {
+        console.error('Metrics Error:', error);
+        res.status(500).json({ message: 'Server error fetching metrics' });
+    }
+};
