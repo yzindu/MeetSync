@@ -40,7 +40,7 @@ exports.createReport = async (req, res) => {
     }
 }
 
-// get reports
+// get report of the users 
 exports.getReports = async (req, res) => {
     try {
         const Report = await Report.find({ userId: req.user.id })
@@ -55,4 +55,30 @@ exports.getReports = async (req, res) => {
     }
 }
 
-// update report 
+// Get fillered report for managers only 
+
+exports.getAllReports = async (req, res) => {
+    try {
+        const { userId, projectId, status, weekStartDate, weekEndDate } = req.query;
+
+        const filter = {};
+        if (userId) filter.userId = userId;
+        if (projectId) filter.projectId = projectId;
+        if (status) filter.status = status;
+
+        if (startDate && endDate) {
+            filter.weekStartDate = { $gte: new Date(startDate) };
+            filter.weekEndDate = { $lte: new Date(endDate) };
+        }
+
+        const reposts = await Report.find(filter)
+            .populate('userId', 'name')
+            .populate('projectId', 'name')
+            .sort({ weekStartDate: -1 });
+
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error during report fetching' });
+    }
+}
