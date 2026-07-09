@@ -30,6 +30,8 @@ app.use('/api/reports', require('./routes/reportRoutes'));
 
 app.use('/api/projects', require('./routes/projectRoutes'));
 
+app.use('/api/users', require('./routes/userRoutes'));
+
 // --- START SERVER ---
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

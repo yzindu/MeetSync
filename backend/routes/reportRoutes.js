@@ -1,18 +1,31 @@
 const express = require('express');
 const router = express.Router();
-const { createReport, getReports, getAllReports, getDashboardMetrics } = require('../controllers/weeklyReportController');
+const {
+    createReport,
+    getReports,
+    getAllReports,
+    getDashboardMetrics,
+    getReportById,
+    updateReport
+} = require('../controllers/weeklyReportController');
 const { protect, authorize } = require('../middleware/authMiddleware');
 
-// create a report for users 
+// POST /api/reports — create a new report (authenticated users)
 router.post('/', protect, createReport);
 
-// get the reports of the user who is logged in 
+// GET /api/reports/me — get current user's own reports
 router.get('/me', protect, getReports);
 
-// get all the reports for managers and admns
+// GET /api/reports/metrics — dashboard metrics (Manager only)
+router.get('/metrics', protect, authorize('Manager'), getDashboardMetrics);
+
+// GET /api/reports — get all reports (Manager only, with filters)
 router.get('/', protect, authorize('Manager'), getAllReports);
 
-// get dashboard metrixs for managers 
-router.get('/metrics', protect, authorize('Manager'), getDashboardMetrics);
+// GET /api/reports/:id — get single report (owner or manager)
+router.get('/:id', protect, getReportById);
+
+// PUT /api/reports/:id — update own report
+router.put('/:id', protect, updateReport);
 
 module.exports = router;

@@ -151,3 +151,54 @@ exports.getDashboardMetrics = async (req, res) => {
         res.status(500).json({ message: 'Server error fetching metrics' });
     }
 };
+
+// Get a single report by ID (owner or manager)
+exports.getReportById = async (req, res) => {
+    try {
+        const report = await Report.findById(req.params.id)
+            .populate('projectId', 'name')
+            .populate('userId', 'name email');
+
+        if (!report) return res.status(404).json({ message: 'Report not found' });
+
+        // Only the owner or a Manager can view it
+        if (req.user.role !== 'Manager' && report.userId._id.toString() !== req.user.id) {
+            return res.status(403).json({ message: 'Not authorized to view this report' });
+        }
+
+        res.status(200).json(report);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error fetching report' });
+    }
+};
+
+// Update own report (Member can edit Pending or Late reports)
+exports.updateReport = async (req, res) => {
+    try {
+        const report = await Report.findById(req.params.id);
+        if (!report) return res.status(404).json({ message: 'Report not found' });
+
+        // Only the report owner can edit it
+        if (report.userId.toString() !== req.user.id) {
+            return res.status(403).json({ message: 'Not authorized to edit this report' });
+        }
+
+        const {
+            projectId, weekStartDate, weekEndDate,
+            tasksCompleted, tasksPlanned, blockers,
+            hoursWorked, notes, status
+        } = req.body;
+
+        const updated = await Report.findByIdAndUpdate(
+            req.params.id,
+            { projectId, weekStartDate, weekEndDate, tasksCompleted, tasksPlanned, blockers, hoursWorked, notes, status },
+            { new: true, runValidators: true }
+        ).populate('projectId', 'name');
+
+        res.status(200).json(updated);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error updating report' });
+    }
+};
