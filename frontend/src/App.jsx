@@ -6,6 +6,10 @@ import Reports from './pages/member/Reports';
 import WeeklyReport from './pages/member/WeeklyReport';
 import ReportHistory from './pages/member/ReportHistory';
 import ProjectsPage from './pages/member/ProjectsPage';
+import ManagerLayout from './layouts/ManagerLayout';
+import ManagerDashboard from './pages/manager/ManagerDashboard';
+import TeamReports from './pages/manager/TeamReports';
+import ProjectsManager from './pages/manager/ProjectsManager';
 
 function App() {
   return (
@@ -24,6 +28,14 @@ function App() {
           <Route path="weekly"   element={<WeeklyReport />} />
           <Route path="history"  element={<ReportHistory />} />
           <Route path="projects" element={<ProjectsPage />} />
+        </Route>
+
+        {/* Manager Routes */}
+        <Route path="/manager" element={<ManagerLayout />}>
+          <Route index element={<Navigate to="dashboard" replace />} />
+          <Route path="dashboard" element={<ManagerDashboard />} />
+          <Route path="reports"   element={<TeamReports />} />
+          <Route path="projects"  element={<ProjectsManager />} />
         </Route>
 
       </Routes>

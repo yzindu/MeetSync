@@ -111,7 +111,7 @@ export default function Reports() {
                 </div>
 
                 {/* Compliance Card */}
-                <div className="bg-gradient-to-br from-[#eef0f6] to-[#e4e7f1] rounded-2xl p-6 border border-white/50 shadow-sm flex flex-col justify-center h-[160px]">
+                <div className="bg-linear-to-br from-[#eef0f6] to-[#e4e7f1] rounded-2xl p-6 border border-white/50 shadow-sm flex flex-col justify-center h-[160px]">
                     <div className="flex items-center gap-2 mb-1">
                         <TrendingUp className="w-4 h-4 text-primary" />
                         <h3 className="text-sm font-semibold text-muted-foreground">Compliance Rate</h3>
