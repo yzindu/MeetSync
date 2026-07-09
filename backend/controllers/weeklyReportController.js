@@ -152,6 +152,88 @@ exports.getDashboardMetrics = async (req, res) => {
     }
 };
 
+// Get chart data for Manager dashboard (tasks trend, workload by project, status by member)
+exports.getChartData = async (req, res) => {
+    try {
+        // 1. Tasks completed trend — group by week, count total tasks across reports
+        const tasksTrend = await Report.aggregate([
+            { $match: { status: 'Submitted' } },
+            {
+                $group: {
+                    _id: { $dateToString: { format: '%Y-%m-%d', date: '$weekStartDate' } },
+                    totalTasks: { $sum: { $size: { $ifNull: ['$tasksCompleted', []] } } },
+                    reportCount: { $sum: 1 }
+                }
+            },
+            { $sort: { _id: 1 } },
+            { $limit: 12 } // Last 12 weeks
+        ]);
+
+        // 2. Workload by project — count reports and tasks per project
+        const workloadByProject = await Report.aggregate([
+            {
+                $group: {
+                    _id: '$projectId',
+                    reportCount: { $sum: 1 },
+                    totalTasks: { $sum: { $size: { $ifNull: ['$tasksCompleted', []] } } }
+                }
+            },
+            {
+                $lookup: {
+                    from: 'projects',
+                    localField: '_id',
+                    foreignField: '_id',
+                    as: 'project'
+                }
+            },
+            { $unwind: { path: '$project', preserveNullAndEmpty: true } },
+            {
+                $project: {
+                    projectName: { $ifNull: ['$project.name', 'Unknown'] },
+                    reportCount: 1,
+                    totalTasks: 1
+                }
+            },
+            { $sort: { reportCount: -1 } }
+        ]);
+
+        // 3. Submission status by team member
+        const statusByMember = await Report.aggregate([
+            {
+                $group: {
+                    _id: '$userId',
+                    submitted: { $sum: { $cond: [{ $eq: ['$status', 'Submitted'] }, 1, 0] } },
+                    pending:   { $sum: { $cond: [{ $eq: ['$status', 'Pending'] }, 1, 0] } },
+                    late:      { $sum: { $cond: [{ $eq: ['$status', 'Late'] }, 1, 0] } },
+                    total:     { $sum: 1 }
+                }
+            },
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: '_id',
+                    foreignField: '_id',
+                    as: 'user'
+                }
+            },
+            { $unwind: { path: '$user', preserveNullAndEmpty: true } },
+            {
+                $project: {
+                    memberName: { $ifNull: ['$user.name', 'Unknown'] },
+                    submitted: 1, pending: 1, late: 1, total: 1
+                }
+            },
+            { $sort: { total: -1 } }
+        ]);
+
+        res.status(200).json({ tasksTrend, workloadByProject, statusByMember });
+
+    } catch (error) {
+        console.error('Chart Data Error:', error);
+        res.status(500).json({ message: 'Server error fetching chart data' });
+    }
+};
+
 // Get a single report by ID (owner or manager)
 exports.getReportById = async (req, res) => {
     try {
