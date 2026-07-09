@@ -186,7 +186,7 @@ exports.getChartData = async (req, res) => {
                     as: 'project'
                 }
             },
-            { $unwind: { path: '$project', preserveNullAndEmpty: true } },
+            { $unwind: { path: '$project', preserveNullAndEmptyArrays: true } },
             {
                 $project: {
                     projectName: { $ifNull: ['$project.name', 'Unknown'] },
@@ -216,7 +216,7 @@ exports.getChartData = async (req, res) => {
                     as: 'user'
                 }
             },
-            { $unwind: { path: '$user', preserveNullAndEmpty: true } },
+            { $unwind: { path: '$user', preserveNullAndEmptyArrays: true } },
             {
                 $project: {
                     memberName: { $ifNull: ['$user.name', 'Unknown'] },
