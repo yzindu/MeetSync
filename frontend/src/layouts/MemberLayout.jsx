@@ -2,7 +2,7 @@
 import { useContext } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import { Settings, LogOut, Home } from 'lucide-react';
+import { Settings, LogOut, Home, FileText, History, FolderOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function MemberLayout() {
@@ -16,10 +16,10 @@ export default function MemberLayout() {
     };
 
     const navLinks = [
-        { name: 'Overview', path: '/member/reports', icon: Home },
-        { name: 'Weekly Report', path: '/member/weekly' },
-        { name: 'Reports History', path: '/member/history' },
-        { name: 'Projects', path: '/member/projects' },
+        { name: 'Overview',       path: '/member/reports',  icon: Home },
+        { name: 'Weekly Report',  path: '/member/weekly',   icon: FileText },
+        { name: 'Report History', path: '/member/history',  icon: History },
+        { name: 'Projects',       path: '/member/projects', icon: FolderOpen },
     ];
 
     return (
@@ -36,7 +36,7 @@ export default function MemberLayout() {
                 {/* Centered Pill Navigation */}
                 <nav className="hidden md:flex items-center gap-1 bg-muted/40 p-1.5 rounded-full">
                     {navLinks.map((link) => {
-                        const isActive = location.pathname.includes(link.path);
+                        const isActive = location.pathname === link.path;
                         const Icon = link.icon;
 
                         return (
