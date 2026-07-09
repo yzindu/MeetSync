@@ -20,7 +20,7 @@ exports.createReport = async (req, res) => {
             status
         } = req.body;
 
-        const Report = await Report.create({
+        const report = await Report.create({
             userId,
             projectId,
             weekStartDate,
@@ -32,7 +32,7 @@ exports.createReport = async (req, res) => {
             notes,
             status
         });
-        res.status(201).json(Report)
+        res.status(201).json(report)
     }
     catch (error) {
         console.error(error);
@@ -43,11 +43,11 @@ exports.createReport = async (req, res) => {
 // get report of the users 
 exports.getReports = async (req, res) => {
     try {
-        const Report = await Report.find({ userId: req.user.id })
+        const reports = await Report.find({ userId: req.user.id })
             .populate('projectId', 'name')
             .sort({ weekStartDate: -1 });
 
-        res.status(200).json(Report)
+        res.status(200).json(reports)
     }
     catch (error) {
         console.error(error);
@@ -66,15 +66,17 @@ exports.getAllReports = async (req, res) => {
         if (projectId) filter.projectId = projectId;
         if (status) filter.status = status;
 
-        if (startDate && endDate) {
-            filter.weekStartDate = { $gte: new Date(startDate) };
-            filter.weekEndDate = { $lte: new Date(endDate) };
+        if (weekStartDate && weekEndDate) {
+            filter.weekStartDate = { $gte: new Date(weekStartDate) };
+            filter.weekEndDate = { $lte: new Date(weekEndDate) };
         }
 
-        const reposts = await Report.find(filter)
+        const reports = await Report.find(filter)
             .populate('userId', 'name')
             .populate('projectId', 'name')
             .sort({ weekStartDate: -1 });
+
+        res.status(200).json(reports);
 
     }
     catch (error) {
