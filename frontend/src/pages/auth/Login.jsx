@@ -40,12 +40,12 @@ export default function Login() {
     };
 
     return (
-        <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-primary/5 via-background to-secondary/10 p-4">
+        <div className="flex min-h-screen items-center justify-center bg-linear-to-br from-primary/5 via-background to-secondary/10 p-4">
 
             <Card className="w-full max-w-sm shadow-xl border-border/50 relative overflow-hidden">
 
                 {/* The sleek top gradient bar */}
-                <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-primary/80 to-primary" />
+                <div className="absolute top-0 left-0 w-full h-1.5 bg-linear-to-r from-primary/80 to-primary" />
 
                 <CardHeader className="text-center space-y-1 pt-8">
                     <CardTitle className="text-2xl font-bold tracking-tight text-primary">MeetSync</CardTitle>
