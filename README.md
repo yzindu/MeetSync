@@ -1,6 +1,6 @@
 # MeetSync — Weekly Report Management System
 
-> A full-stack web application for managing team weekly progress reports with role-based access control (RBAC), interactive dashboards, and an AI-powered chat assistant.
+> A full-stack web application for managing team weekly progress reports with role-based access control (RBAC), and interactive dashboards.
 
 ---
 
