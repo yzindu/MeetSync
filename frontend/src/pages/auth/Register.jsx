@@ -1,6 +1,5 @@
-import { useState, useContext } from 'react';
+import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { AuthContext } from '../../context/AuthContext';
 import API from '../../api/axios';
 import { toast } from 'sonner';
 import { Mail, Lock, User, UserPlus } from 'lucide-react';
@@ -19,7 +18,7 @@ export default function Register() {
     const [role, setRole] = useState('Member'); // <-- New state for Role
     const [isLoading, setIsLoading] = useState(false);
 
-    const { login } = useContext(AuthContext);
+
     const navigate = useNavigate();
 
     const handleRegister = async (e) => {
@@ -36,15 +35,8 @@ export default function Register() {
             // We now send the selected role to the backend!
             const response = await API.post('/auth/register', { name, email, password, role });
 
-            login(response.data.user, response.data.token);
-            toast.success('Account created successfully!');
-
-            // Route them based on the role they just registered with
-            if (response.data.user.role === 'Manager') {
-                navigate('/manager/dashboard');
-            } else {
-                navigate('/member/reports');
-            }
+            toast.success('Account created successfully! Please log in.');
+            navigate('/login');
 
         } catch (error) {
             toast.error(error.response?.data?.message || 'Registration failed. Please try again.');

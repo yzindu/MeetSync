@@ -11,8 +11,8 @@ import { Button } from '@/components/ui/button';
 /* ── helpers ── */
 const STATUS_CONFIG = {
     Submitted: { cls: 'bg-emerald-50 text-emerald-700 border-emerald-100', icon: CheckCircle2 },
-    Pending:   { cls: 'bg-amber-50   text-amber-700   border-amber-100',   icon: Clock },
-    Late:      { cls: 'bg-red-50     text-red-700     border-red-100',     icon: AlertTriangle },
+    Pending: { cls: 'bg-amber-50   text-amber-700   border-amber-100', icon: Clock },
+    Late: { cls: 'bg-red-50     text-red-700     border-red-100', icon: AlertTriangle },
 };
 
 const StatusBadge = ({ status }) => {
@@ -99,17 +99,17 @@ function Section({ title, items, empty, accent }) {
 const PAGE_SIZE = 10;
 
 export default function TeamReports() {
-    const [reports,  setReports]  = useState([]);
-    const [users,    setUsers]    = useState([]);
+    const [reports, setReports] = useState([]);
+    const [users, setUsers] = useState([]);
     const [projects, setProjects] = useState([]);
-    const [loading,  setLoading]  = useState(true);
+    const [loading, setLoading] = useState(true);
     const [selected, setSelected] = useState(null);
 
     // Filters
-    const [search,    setSearch]    = useState('');
-    const [filterUser,    setFilterUser]    = useState('');
+    const [search, setSearch] = useState('');
+    const [filterUser, setFilterUser] = useState('');
     const [filterProject, setFilterProject] = useState('');
-    const [filterStatus,  setFilterStatus]  = useState('');
+    const [filterStatus, setFilterStatus] = useState('');
 
     // Pagination
     const [page, setPage] = useState(1);
@@ -118,13 +118,13 @@ export default function TeamReports() {
         setLoading(true);
         try {
             const params = {};
-            if (filterUser)    params.userId    = filterUser;
+            if (filterUser) params.userId = filterUser;
             if (filterProject) params.projectId = filterProject;
-            if (filterStatus)  params.status    = filterStatus;
+            if (filterStatus) params.status = filterStatus;
 
             const [rRes, uRes, pRes] = await Promise.all([
                 API.get('/reports', { params }),
-                API.get('/auth/users'),
+                API.get('/users'),
                 API.get('/projects'),
             ]);
             setReports(rRes.data);
@@ -153,7 +153,7 @@ export default function TeamReports() {
     });
 
     const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-    const paginated  = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+    const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
     const clearFilters = () => {
         setSearch('');
